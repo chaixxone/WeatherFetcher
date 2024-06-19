@@ -1,0 +1,9 @@
+x64
+WindowsProject1.cpp
+WindowsProject1.rc
+*.vcxproj
+*.h
+*.ico
+*.filters
+*.user
+*.txt
