@@ -7,3 +7,5 @@ WindowsProject1.rc
 *.filters
 *.user
 *.txt
+*.dll 
+ 
