@@ -9,6 +9,7 @@
 #include <boost/asio.hpp>
 #include "json.hpp"
 #include "weather_mapper_interface.hpp"
+#include "database_manager.hpp"
 
 using namespace boost::asio;
 
@@ -22,7 +23,7 @@ private:
 	io_context m_io_context;
 	ip::tcp::socket m_socket;
 	ip::tcp::resolver m_resolver;
-	const std::string m_SECRET_API_KEY;
+	std::string m_SECRET_API_KEY;
 };
 
 #endif
