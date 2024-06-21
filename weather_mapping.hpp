@@ -4,6 +4,7 @@
 #pragma once
 #include <string>
 #include <ctime>
+#include <iomanip>
 #include <boost/asio.hpp>
 #include "json.hpp"
 #include "weather_mapper_interface.hpp"

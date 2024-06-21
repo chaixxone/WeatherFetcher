@@ -1,8 +1,8 @@
 #include "weather_mapping.hpp"
 
-WeatherMapper::WeatherMapper() : m_io_context(), m_socket(m_io_context), m_resolver(m_io_context) 
-{ 
-	std::unique_ptr<DB_Manager> dbman;
+WeatherMapper::WeatherMapper() : m_io_context(), m_socket(m_io_context), m_resolver(m_io_context)
+{
+	std::unique_ptr<DB_Manager> dbman = std::make_unique<DB_Manager>();
 	m_SECRET_API_KEY = dbman->GetKey();
 }
 
@@ -42,7 +42,15 @@ WeatherData WeatherMapper::FetchWeatherData(const std::string& city)
 	m_socket.send(buffer(getRequest));
 
 	streambuf api_response;
-	read_until(m_socket, api_response, "\r\n");
+
+	try
+	{
+		read_until(m_socket, api_response, "\r\n");
+	}
+	catch (const boost::system::system_error& e)
+	{
+		std::cerr << "Boost system error: " << e.what() << std::endl;
+	}
 
 	std::istream responseStream(&api_response);
 	std::string httpVersion;
@@ -63,24 +71,41 @@ WeatherData WeatherMapper::FetchWeatherData(const std::string& city)
 		throw std::runtime_error("Response returned with status code " + std::to_string(statusCode));
 	}
 
-	read_until(m_socket, api_response, "\r\n\r\n");
+	boost::system::error_code error;
 
-	std::string responseData;
-	if (api_response.size() > 0) 
+	while (boost::asio::read(m_socket, api_response, boost::asio::transfer_at_least(1), error))
 	{
-		std::istream responseStream(&api_response);
-		responseData = std::string((std::istreambuf_iterator<char>(responseStream)), std::istreambuf_iterator<char>());
+		// read while there is some data
 	}
 
-	json jsonResponse = json::parse(responseData);
+	if (error != boost::asio::error::eof)
+	{
+		throw boost::system::system_error(error);
+	}
+
+	std::string responseData = boost::asio::buffer_cast<const char*>(api_response.data());
+
+	size_t jsonDataStartAt = responseData.find_first_of('{');
+
+	if (jsonDataStartAt == std::string::npos)
+	{
+		throw std::runtime_error("Failed to find JSON start");
+	}
+
+	std::string jsonRealData = responseData.substr(jsonDataStartAt);
+
+	json jsonResponse = json::parse(jsonRealData);
 
 	std::string weatherType = jsonResponse["weather"][0]["description"];
-	double temperature = jsonResponse["main"]["temp"];
 
-	std::unique_ptr<WeatherData> weatherData;
+	double temperature = jsonResponse["main"]["temp"] - 273.15;
+	std::stringstream ss;
+	ss << std::fixed << std::setprecision(2) << temperature;
+
+	std::unique_ptr<WeatherData> weatherData = std::make_unique<WeatherData>();
 	weatherData->City = city;
 	weatherData->Date = getCurrent("date");
-	weatherData->Temperature = std::to_string(temperature);
+	weatherData->Temperature = ss.str();
 	weatherData->Time = getCurrent("time");
 	weatherData->WeatherType = weatherType;
 
