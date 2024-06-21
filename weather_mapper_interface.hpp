@@ -2,11 +2,12 @@
 #define WEATHER_MAPPER_INTERFACE_HPP
 
 #include <string>
+#include "weather_data.hpp"
 
 class IWeatherMapper
 {
 public:
-	virtual void FetchWeatherData(const std::string& city) = 0;
+	virtual WeatherData FetchWeatherData(const std::string& city) = 0;
 };
 
 #endif
