@@ -16,11 +16,11 @@ static std::string getCurrent(const std::string& type)
 
 	std::ostringstream type_stream;
 
-	if (type == "time")
+	if (type == "date")
 	{
 		type_stream << std::put_time(&now_tm, "%Y-%m-%d");
 	}
-	else if (type == "date")
+	else if (type == "time")
 	{
 		type_stream << std::put_time(&now_tm, "%H:%M:%S");
 	}
@@ -98,14 +98,12 @@ WeatherData WeatherMapper::FetchWeatherData(const std::string& city)
 
 	std::string weatherType = jsonResponse["weather"][0]["description"];
 
-	double temperature = jsonResponse["main"]["temp"] - 273.15;
-	std::stringstream ss;
-	ss << std::fixed << std::setprecision(2) << temperature;
+	short temperature = jsonResponse["main"]["temp"] - 273;
 
 	std::unique_ptr<WeatherData> weatherData = std::make_unique<WeatherData>();
 	weatherData->City = city;
 	weatherData->Date = getCurrent("date");
-	weatherData->Temperature = ss.str();
+	weatherData->Temperature = std::to_string(temperature);
 	weatherData->Time = getCurrent("time");
 	weatherData->WeatherType = weatherType;
 
