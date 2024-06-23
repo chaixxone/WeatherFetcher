@@ -55,7 +55,7 @@ void DB_Manager::Write(std::unique_ptr<WeatherData> weatherData)
     }
 }
 
-WeatherData DB_Manager::ReadLast()
+WeatherData DB_Manager::ReadLast(const std::string& city)
 {
     WeatherData lastWDSnapshot;
 
@@ -69,14 +69,14 @@ WeatherData DB_Manager::ReadLast()
         connection = std::unique_ptr<sql::Connection>(m_driver->connect(m_server, m_username, m_password));        
         connection->setSchema("weather");
 
-        pstmt = std::unique_ptr<sql::PreparedStatement>(connection->prepareStatement("SELECT * FROM snapshots ORDER BY id DESC LIMIT 1;"));
+        pstmt = std::unique_ptr<sql::PreparedStatement>(connection->prepareStatement("SELECT * FROM snapshots WHERE city='" + city + "' ORDER BY id DESC LIMIT 1; "));
         result = std::unique_ptr<sql::ResultSet>(pstmt->executeQuery());
         
         if (result->next())
         {
             lastWDSnapshot.Date = result->getString("snap_date");
             lastWDSnapshot.Time = result->getString("snap_time");
-            lastWDSnapshot.City = result->getString("city");
+            lastWDSnapshot.City = city;
             lastWDSnapshot.Temperature = std::to_string(result->getDouble("temperature"));
             lastWDSnapshot.WeatherType = result->getString("weather_type");
         }
