@@ -16,11 +16,11 @@ static std::string getCurrent(const std::string& type)
 
 	std::ostringstream type_stream;
 
-	if (type == "time")
+	if (type == "date")
 	{
 		type_stream << std::put_time(&now_tm, "%Y-%m-%d");
 	}
-	else if (type == "date")
+	else if (type == "time")
 	{
 		type_stream << std::put_time(&now_tm, "%H:%M:%S");
 	}
