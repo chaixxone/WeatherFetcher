@@ -1,0 +1,8 @@
+x64
+main.cpp
+json.hpp
+*.vcxproj
+*.filters
+*.user
+*.txt
+*.dll
