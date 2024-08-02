@@ -15,7 +15,7 @@
 class DB_Manager : IDB_Manager
 {
 public:
-	DB_Manager(const std::string& pathToPassword);
+	DB_Manager(const std::unordered_map<std::string, std::string>& config);
 	void Write(std::unique_ptr<WeatherData> weatherData) override;
 	WeatherData ReadLast(const std::string& city) override;
 	std::string GetKey() override;

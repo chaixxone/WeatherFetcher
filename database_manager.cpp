@@ -21,11 +21,12 @@ std::string DB_Manager::_getPassword(const std::string& pathToFile)
     return password;
 }
 
-DB_Manager::DB_Manager(const std::string& pathToPassword) : m_server("tcp://localhost:3306"), m_username("root"), m_password(_getPassword(pathToPassword))
+DB_Manager::DB_Manager(const std::unordered_map<std::string, std::string>& config) 
+    : m_server(config.at("host")), m_username(config.at("user")), m_password(_getPassword(config.at("password_file")))
 { 
     m_driver = get_driver_instance();
     m_connection = std::unique_ptr<sql::Connection>(m_driver->connect(m_server, m_username, m_password));
-    m_connection->setSchema("weather");
+    m_connection->setSchema(config.at("schema"));
 }
 
 void DB_Manager::Write(std::unique_ptr<WeatherData> weatherData)
@@ -34,7 +35,7 @@ void DB_Manager::Write(std::unique_ptr<WeatherData> weatherData)
     {
         auto pstmt = std::unique_ptr<sql::PreparedStatement>(
             m_connection->prepareStatement(
-                "INSERT INTO snapshots (snap_date, snap_time, city, temperature, weather_type) VALUES (?, ?, ?, ?, ?)"
+                "INSERT INTO snaps (snap_date, snap_time, city, temperature, weather_type) VALUES (?, ?, ?, ?, ?)"
             )
         );
 
@@ -61,7 +62,7 @@ WeatherData DB_Manager::ReadLast(const std::string& city)
     {
         auto pstmt = std::unique_ptr<sql::PreparedStatement>(
             m_connection->prepareStatement(
-                "SELECT * FROM snapshots WHERE city=? ORDER BY id DESC LIMIT 1"
+                "SELECT * FROM snaps WHERE city=? ORDER BY id DESC LIMIT 1"
             )
         );
         pstmt->setString(1, city);
