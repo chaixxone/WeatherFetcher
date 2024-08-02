@@ -1,8 +1,12 @@
 x64
 main.cpp
+ZClient.hpp
+stdafx.hpp
+stdafx.cpp
 json.hpp
 *.vcxproj
 *.filters
 *.user
 *.txt
 *.dll
+*.lib
