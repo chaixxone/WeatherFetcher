@@ -1,8 +1,8 @@
 #include "weather_mapping.hpp"
 
-WeatherMapper::WeatherMapper()
+WeatherMapper::WeatherMapper(const std::unordered_map<std::string, std::string>& config)
 { 
-	std::unique_ptr<DB_Manager> dbman = std::make_unique<DB_Manager>("password.txt");
+	std::unique_ptr<DB_Manager> dbman = std::make_unique<DB_Manager>(config);
 	m_SECRET_API_KEY = dbman->GetKey();
 }
 
@@ -28,7 +28,7 @@ static std::string getCurrent(const std::string& type)
 	return type_stream.str();
 }
 
-WeatherData WeatherMapper::FetchWeatherData(const std::string& city)
+std::string WeatherMapper::FetchWeatherData(const std::string& city)
 {
 	std::stringstream request;
 	request << "https://api.openweathermap.org/data/2.5/weather?q=" << city << "&appid=" << m_SECRET_API_KEY;
@@ -49,12 +49,12 @@ WeatherData WeatherMapper::FetchWeatherData(const std::string& city)
 	std::string weatherType = jsonResponse["weather"][0]["description"];
 	short temperature = jsonResponse["main"]["temp"] - 273;
 
-	WeatherData weatherData;
-	weatherData.City = city;
-	weatherData.Date = getCurrent("date");
-	weatherData.Temperature = std::to_string(temperature);
-	weatherData.Time = getCurrent("time");
-	weatherData.WeatherType = weatherType;
+	json receivedData;
+	receivedData["city"] = city;
+	receivedData["date"] = getCurrent("date");
+	receivedData["temp"] = temperature;
+	receivedData["time"] = getCurrent("time");
+	receivedData["weather"] = weatherType;	
 
-	return weatherData;
+	return receivedData.dump();
 }

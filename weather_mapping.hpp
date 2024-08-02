@@ -14,8 +14,8 @@ using json = nlohmann::json;
 class WeatherMapper : IWeatherMapper
 {
 public:
-	WeatherMapper();
-	WeatherData FetchWeatherData(const std::string& city) override;
+	WeatherMapper(const std::unordered_map<std::string, std::string>& config);
+	std::string FetchWeatherData(const std::string& city) override;
 
 private:
 	std::string m_SECRET_API_KEY;
