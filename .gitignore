@@ -10,3 +10,4 @@ json.hpp
 *.txt
 *.dll
 *.lib
+*.json 
