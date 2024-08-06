@@ -9,4 +9,5 @@ json.hpp
 *.user
 *.txt
 *.dll
-*.lib*.json 
+*.lib
+*.json 
