@@ -1,10 +1,6 @@
 #include "weather_mapping.hpp"
 
-WeatherMapper::WeatherMapper(const std::unordered_map<std::string, std::string>& config)
-{ 
-	std::unique_ptr<DB_Manager> dbman = std::make_unique<DB_Manager>(config);
-	m_SECRET_API_KEY = dbman->GetKey();
-}
+WeatherMapper::WeatherMapper(const std::string& apiKey) : m_SECRET_API_KEY(apiKey) {}
 
 static std::string getCurrent(const std::string& type)
 {
