@@ -24,7 +24,7 @@ static std::string getCurrent(const std::string& type)
 	return type_stream.str();
 }
 
-std::string WeatherMapper::FetchWeatherData(const std::string& city)
+std::string WeatherMapper::FetchWeatherData(const std::string& city) const
 {
 	std::stringstream request;
 	request << "https://api.openweathermap.org/data/2.5/weather?q=" << city << "&appid=" << m_SECRET_API_KEY;

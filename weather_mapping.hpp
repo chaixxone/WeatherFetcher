@@ -6,16 +6,14 @@
 #include <ctime>
 #include <cpr/cpr.h>
 #include "json.hpp"
-#include "weather_mapper_interface.hpp"
-#include "database_manager.hpp"
 
 using json = nlohmann::json;
 
-class WeatherMapper : IWeatherMapper
+class WeatherMapper
 {
 public:
 	WeatherMapper(const std::string& apiKey);
-	std::string FetchWeatherData(const std::string& city) override;
+	std::string FetchWeatherData(const std::string& city) const;
 
 private:
 	std::string m_SECRET_API_KEY;
