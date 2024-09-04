@@ -151,19 +151,3 @@ void Z_API::_handleRequests(const Requests& requestEnum, const std::string& requ
         _socket.send(zmq::str_buffer("Authentication required or token invalid"));
     }
 }
-
-std::string Z_API::_getFileData(const std::string& filePath) const
-{
-    std::ifstream file(filePath);
-
-    if (!file.is_open())
-    {
-        return "Unable to open file";
-    }
-
-    std::stringstream fileStream;
-    fileStream << file.rdbuf();
-    file.close();
-
-    return fileStream.str();
-}
