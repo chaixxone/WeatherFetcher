@@ -1,0 +1,4 @@
+*.json
+*.vcxproj
+*.filters
+*.user

@@ -1,0 +1,14 @@
+QLabel, QLineEdit {
+    font-family: 'JetBrains Mono', sans-serif;
+}
+
+QLineEdit {
+    border: none;
+    border-radius: 5px;    
+    font-size: 18px;
+    padding: 5px;
+}
+
+QLabel {
+    font-size: 16px;
+}
