@@ -6,7 +6,6 @@ protected:
     enum class Requests
     {
         Authorisation,
-        GetFileData,
         InsertImage,
         GetImage,
         GetAPIKey,
@@ -19,7 +18,6 @@ protected:
     {
         static const std::unordered_map<std::string, Requests> requestMap = {
             { "auth", Requests::Authorisation },
-            { "get_data_from_file", Requests::GetFileData },
             { "insert_weather_data", Requests::InsertWeatherData },
             { "get_weather_data", Requests::GetWeatherData },
             { "get_image", Requests::GetImage },
