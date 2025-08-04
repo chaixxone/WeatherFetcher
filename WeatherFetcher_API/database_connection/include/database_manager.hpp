@@ -4,11 +4,11 @@
 #include <stdexcept>
 #include <fstream>
 #include <sstream>
-#include <mysql_connection.h>
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/resultset.h>
-#include <cppconn/prepared_statement.h>
+#include <jdbc/mysql_connection.h>
+#include <jdbc/cppconn/driver.h>
+#include <jdbc/cppconn/exception.h>
+#include <jdbc/cppconn/resultset.h>
+#include <jdbc/cppconn/prepared_statement.h>
 #include "weather_data.hpp"
 
 class DB_Manager
