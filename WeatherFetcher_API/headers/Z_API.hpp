@@ -14,8 +14,8 @@ public:
 private:
     zmq::context_t _context;
     zmq::socket_t _socket;
-    TokenInfo tokenOfClient;
-    std::unique_ptr<DB_Manager> m_db;
+    TokenInfo _clientToken;
+    std::unique_ptr<DB_Manager> _db;
 
     bool VerifyJWT(const std::string& token);
     void HandleRequests(const Requests& requestEnum, const std::string& requestData, const std::string& token);    

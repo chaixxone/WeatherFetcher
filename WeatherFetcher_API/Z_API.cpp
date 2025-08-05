@@ -2,7 +2,7 @@
 #include <filesystem>
 
 Z_API::Z_API(const std::string& host, const std::unordered_map<std::string, std::string>& config) 
-    : _context(1), _socket(_context, zmq::socket_type::rep), tokenOfClient(), m_db(new DB_Manager(config))
+    : _context(1), _socket(_context, zmq::socket_type::rep), _clientToken(), _db(new DB_Manager(config))
 {
     _socket.bind(host);
 }
@@ -73,16 +73,16 @@ void Z_API::HandleRequests(const Requests& requestEnum, const std::string& reque
     {
         auto now = std::chrono::system_clock::now();
         auto exp_time = now + std::chrono::seconds(10);
-        tokenOfClient.SetInfo(token, exp_time);
+        _clientToken.SetInfo(token, exp_time);
         _socket.send(zmq::str_buffer("Authentication successful"));
     }
-    else if (!tokenOfClient.IsExpired())
+    else if (!_clientToken.IsExpired())
     {
         switch (requestEnum)
         {
         case Requests::GetAPIKey:
         {
-            auto APIKey = m_db->GetKey();
+            auto APIKey = _db->GetKey();
             _socket.send(zmq::buffer(APIKey));
             std::cout << "new connection!" << std::endl;
             break;
@@ -91,20 +91,20 @@ void Z_API::HandleRequests(const Requests& requestEnum, const std::string& reque
         {
             std::filesystem::path filepath(requestData);                
             std::string weatherTypeName = filepath.stem().string();
-            m_db->LoadImageData(requestData, weatherTypeName);
+            _db->LoadImageData(requestData, weatherTypeName);
             _socket.send(zmq::str_buffer("successfully loaded file"));
             break;
         }
         case Requests::GetImage:
         {
-            auto imageDataStr = m_db->GetImageData(requestData);
+            auto imageDataStr = _db->GetImageData(requestData);
             zmq::message_t imageData(imageDataStr);
             _socket.send(imageData);
             break;
         }
         case Requests::GetWeatherData:
         {            
-            auto snapshot = m_db->ReadLast(requestData);    
+            auto snapshot = _db->ReadLast(requestData);    
 
             std::string response = "no data";
 
@@ -136,7 +136,7 @@ void Z_API::HandleRequests(const Requests& requestEnum, const std::string& reque
             incomingData->Time = data["time"];
             incomingData->WeatherType = data["weather"];
 
-            m_db->Write(std::move(incomingData));
+            _db->Write(std::move(incomingData));
 
             _socket.send(zmq::str_buffer("successfully sent"));
             break;
