@@ -33,6 +33,7 @@ private:
 	std::string _fetchDataAndUpdateDb(const std::string& city);
 	std::string _getWeatherData(const std::string& city);
 	void _applyStyleSheet();
+	void Reconnect();
 	
 private slots:
 	void _showSpecificPicture(const std::string& weatherType);

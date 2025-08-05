@@ -119,6 +119,12 @@ void FetcherWindow::InitializeWeatherMapper()
 	}
 }
 
+void FetcherWindow::Reconnect()
+{
+	_client.reset(new ZClient());
+	_client->Connect();
+}
+
 void FetcherWindow::_applyStyleSheet()
 {
 	QFile file(":/WetherFetcher_Qt/style.qss");
