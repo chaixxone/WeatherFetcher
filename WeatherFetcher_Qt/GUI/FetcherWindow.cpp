@@ -92,10 +92,9 @@ void FetcherWindow::Connect()
 			_connected.store(true, std::memory_order_relaxed);
 			InitializeWeatherMapper();
 		}
-		catch (const std::runtime_error& e)
+		catch (const std::runtime_error&)
 		{
-			// TODO: inform user with message box about connection failure
-			std::cerr << e.what() << '\n';
+			emit ConnectionFailed();
 		}
 	});
 
