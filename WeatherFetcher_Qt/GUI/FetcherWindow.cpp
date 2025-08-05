@@ -1,13 +1,13 @@
 #include "FetcherWindow.hpp"
+
 #include <QDateTime>
 #include <QFile>
+#include <QMessageBox>
+#include <QTimer>
 #include <QRegularExpression>
 
-FetcherWindow::FetcherWindow(const std::string& host) : _defaultDataOutput("No data fetched..."), _client(new ZClient(host)), _lastWeatherType("")
+FetcherWindow::FetcherWindow() : _defaultDataOutput("No data fetched..."), _client(new ZClient), _lastWeatherType(""), _connected(false)
 {
-	auto key = _client->MakeRequest("get_api_key", "");
-	_weatherMapper = std::make_unique<WeatherMapper>(key);
-
 	auto cityInput = new QLineEdit(this);
 	auto fetchedDataLabel = new QLabel(this);
 	auto weatherPictureLabel = new QLabel(this);
@@ -52,12 +52,81 @@ FetcherWindow::FetcherWindow(const std::string& host) : _defaultDataOutput("No d
 		}
 	});
 
+	connect(this, &FetcherWindow::ConnectionFailed, this, [this]() {
+		auto connectionFailureMessage = new QMessageBox(this);
+		connectionFailureMessage->setText("Couldn't connect to API\nWould you like to reconnect?");
+		connectionFailureMessage->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		connectionFailureMessage->show();
+
+		int buttonCode = connectionFailureMessage->exec();
+
+		if (buttonCode == QMessageBox::StandardButton::Yes)
+		{
+			Reconnect();
+		}
+		else
+		{
+			close();
+		}
+	});
+
 	setFixedSize(800, 600);
 	_setupLayout(cityInput, fetchedDataLabel, weatherPictureLabel);
 	_applyStyleSheet();
 
 	QIcon icon(":/WetherFetcher_Qt/logo.png");
 	setWindowIcon(icon);
+}
+
+void FetcherWindow::SetHost(const std::string& host) noexcept
+{
+	_host = host;
+}
+
+void FetcherWindow::Connect()
+{
+	std::thread connectionJob([this]() {
+		try
+		{
+			_client->Connect(_host);
+			_connected.store(true, std::memory_order_relaxed);
+			InitializeWeatherMapper();
+		}
+		catch (const std::runtime_error&)
+		{
+			emit ConnectionFailed();
+		}
+	});
+
+	const int timeoutDuration = 5000;
+
+	QTimer::singleShot(std::chrono::milliseconds(timeoutDuration), [&]() {
+		if (!_connected.load())
+		{
+			_client->DestroyClientWork();
+		}
+	});
+
+	connectionJob.detach();
+}
+
+void FetcherWindow::InitializeWeatherMapper()
+{
+	try
+	{		
+		std::string key = _client->MakeRequest("get_api_key", "");
+		_weatherMapper = std::make_unique<WeatherMapper>(key);
+	}
+	catch (const std::runtime_error& e)
+	{
+		// TODO handle exception
+	}
+}
+
+void FetcherWindow::Reconnect()
+{
+	_client.reset(new ZClient());
+	Connect();
 }
 
 void FetcherWindow::_applyStyleSheet()

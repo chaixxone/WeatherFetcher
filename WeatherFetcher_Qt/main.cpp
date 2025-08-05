@@ -17,9 +17,11 @@ int main(int argc, char *argv[])
 
     const char* server = argc == 2 ? argv[1] : "tcp://localhost:5555";
 
-    FetcherWindow window(server);
-
+    FetcherWindow window;
     window.show();
+
+    window.SetHost(server);
+    window.Connect();
 
     return application.exec();
 }

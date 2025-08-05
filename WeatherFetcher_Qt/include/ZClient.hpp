@@ -1,20 +1,24 @@
 #pragma once
-#include <zmq.hpp>
-#include <zmq_addon.hpp>
 #include <iostream>
 #include <fstream>
-#include "json.hpp"
-#include <thread>
-#include <jwt-cpp/jwt.h>
 #include <chrono>
+#include <mutex>
+
+#include <zmq.hpp>
+#include <zmq_addon.hpp>
+#include "json.hpp"
+#include <jwt-cpp/jwt.h>
 
 class ZClient
 {
 public:
-	ZClient(const std::string& host);
+	ZClient();
 	std::string MakeRequest(const std::string& typeRequest, const std::string& data);
+	void Connect(const std::string& host);
+	void DestroyClientWork();
 
 private:
+	std::mutex _mutex;
 	zmq::context_t _context;
 	zmq::socket_t _socket;
 	std::string _token;
