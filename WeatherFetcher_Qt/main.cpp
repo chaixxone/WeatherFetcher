@@ -20,7 +20,8 @@ int main(int argc, char *argv[])
     FetcherWindow window;
     window.show();
 
-    window.Connect(server);
+    window.SetHost(server);
+    window.Connect();
 
     return application.exec();
 }
