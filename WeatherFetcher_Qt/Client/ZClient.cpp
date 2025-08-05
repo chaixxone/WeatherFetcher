@@ -4,7 +4,7 @@ using namespace std::chrono;
 
 ZClient::ZClient() : _context(1), _socket(_context, zmq::socket_type::req)
 {
-	
+	_socket.set(zmq::sockopt::linger, 2000);
 }
 
 void ZClient::_setToken()
