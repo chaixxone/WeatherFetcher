@@ -17,6 +17,6 @@ private:
     TokenInfo tokenOfClient;
     std::unique_ptr<DB_Manager> m_db;
 
-    bool _verifyJWT(const std::string& token);
-    void _handleRequests(const Requests& requestEnum, const std::string& requestData, const std::string& token);    
+    bool VerifyJWT(const std::string& token);
+    void HandleRequests(const Requests& requestEnum, const std::string& requestData, const std::string& token);    
 };

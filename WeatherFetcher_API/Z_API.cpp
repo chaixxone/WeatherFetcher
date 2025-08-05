@@ -27,7 +27,7 @@ void Z_API::Run()
             std::string additionalData = request.popstr();
 
             Requests requestEnum = StringToEnum(requestStr);
-            _handleRequests(requestEnum, additionalData, token);
+            HandleRequests(requestEnum, additionalData, token);
         }
         catch (const zmq::error_t& e)
         {
@@ -40,7 +40,7 @@ void Z_API::Run()
     }
 }
 
-bool Z_API::_verifyJWT(const std::string& token)
+bool Z_API::VerifyJWT(const std::string& token)
 {
     try
     {
@@ -67,9 +67,9 @@ bool Z_API::_verifyJWT(const std::string& token)
     }
 }
 
-void Z_API::_handleRequests(const Requests& requestEnum, const std::string& requestData, const std::string& token)
+void Z_API::HandleRequests(const Requests& requestEnum, const std::string& requestData, const std::string& token)
 {
-    if (requestEnum == Requests::Authorisation && _verifyJWT(token))
+    if (requestEnum == Requests::Authorisation && VerifyJWT(token))
     {
         auto now = std::chrono::system_clock::now();
         auto exp_time = now + std::chrono::seconds(10);
