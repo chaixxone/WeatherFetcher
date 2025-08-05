@@ -35,7 +35,7 @@ FetcherWindow::FetcherWindow() : _defaultDataOutput("No data fetched..."), _clie
 		}
 
 		std::string cityTextStd = cityText.toStdString();		
-		_displayWeatherData(cityTextStd);
+		DisplayWeatherData(cityTextStd);
 		auto fetchedDataStr = fetchedDataLabel->text();
 
 		if (fetchedDataStr != _defaultDataOutput)
@@ -46,7 +46,7 @@ FetcherWindow::FetcherWindow() : _defaultDataOutput("No data fetched..."), _clie
 
 			if (_lastWeatherType != currentWeather || _lastWeatherType.empty())
 			{
-				_showSpecificPicture(currentWeather);
+				ShowSpecificPicture(currentWeather);
 				_lastWeatherType = currentWeather;
 			}
 		}
@@ -71,8 +71,8 @@ FetcherWindow::FetcherWindow() : _defaultDataOutput("No data fetched..."), _clie
 	});
 
 	setFixedSize(800, 600);
-	_setupLayout(cityInput, fetchedDataLabel, weatherPictureLabel);
-	_applyStyleSheet();
+	SetupLayout(cityInput, fetchedDataLabel, weatherPictureLabel);
+	ApplyStyleSheet();
 
 	QIcon icon(":/WetherFetcher_Qt/logo.png");
 	setWindowIcon(icon);
@@ -129,7 +129,7 @@ void FetcherWindow::Reconnect()
 	Connect();
 }
 
-void FetcherWindow::_applyStyleSheet()
+void FetcherWindow::ApplyStyleSheet()
 {
 	QFile file(":/WetherFetcher_Qt/style.qss");
 
@@ -144,7 +144,7 @@ void FetcherWindow::_applyStyleSheet()
 	setStyleSheet(styleSheet);
 }
 
-void FetcherWindow::_setupLayout(QLineEdit* cityInput, QLabel* fetchedDataLabel, QLabel* weatherPictureLabel)
+void FetcherWindow::SetupLayout(QLineEdit* cityInput, QLabel* fetchedDataLabel, QLabel* weatherPictureLabel)
 {
 	fetchedDataLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
@@ -162,7 +162,7 @@ void FetcherWindow::_setupLayout(QLineEdit* cityInput, QLabel* fetchedDataLabel,
 	setLayout(mainLayout);
 }
 
-void FetcherWindow::_showSpecificPicture(const std::string& weatherType)
+void FetcherWindow::ShowSpecificPicture(const std::string& weatherType)
 {
 	auto data = _client->MakeRequest("get_image", weatherType);
 	QByteArray byteArray(data.c_str(), data.size());
@@ -196,19 +196,19 @@ static bool hasRecentData(const QString& databaseSnapshotDateTime)
 	return secondsDifference <= oneHourInSeconds;
 }
 
-std::string FetcherWindow::_fetchDataAndUpdateDb(const std::string& city)
+std::string FetcherWindow::FetchDataAndUpdateDb(const std::string& city)
 {
 	auto snapshot = _weatherMapper->FetchWeatherData(city);
 	_client->MakeRequest("insert_weather_data", snapshot);
 	return snapshot;
 }
 
-std::string FetcherWindow::_getWeatherData(const std::string& city)
+std::string FetcherWindow::GetWeatherData(const std::string& city)
 {
 	std::string snapshot = _client->MakeRequest("get_weather_data", city);
 	if (snapshot == "no data")
 	{
-		snapshot = _fetchDataAndUpdateDb(city);
+		snapshot = FetchDataAndUpdateDb(city);
 	}
 	return snapshot;
 }
@@ -244,7 +244,7 @@ static QString formatTextFromJSON(std::string& jsonWeatherData)
 	return QString::fromStdString(buildedString);
 }
 
-void FetcherWindow::_displayWeatherData(const std::string& city)
+void FetcherWindow::DisplayWeatherData(const std::string& city)
 {
 	std::string rawOuput;
 
@@ -254,7 +254,7 @@ void FetcherWindow::_displayWeatherData(const std::string& city)
 
 	try
 	{
-		snapshot = _getWeatherData(city);
+		snapshot = GetWeatherData(city);
 		
 		json jdata = json::parse(snapshot);
 		std::stringstream ss;
@@ -267,7 +267,7 @@ void FetcherWindow::_displayWeatherData(const std::string& city)
 		}
 		else
 		{
-			auto newSnapshot = _fetchDataAndUpdateDb(city);
+			auto newSnapshot = FetchDataAndUpdateDb(city);
 			rawOuput = newSnapshot;
 		}
 	}

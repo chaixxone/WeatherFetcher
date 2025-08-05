@@ -31,15 +31,15 @@ private:
 	std::string _host;
 	std::atomic<bool> _connected;
 
-	void _setupLayout(QLineEdit* cityInput, QLabel* fetchedDataLabel, QLabel* weatherPictureLabel);
-	std::string _fetchDataAndUpdateDb(const std::string& city);
-	std::string _getWeatherData(const std::string& city);
-	void _applyStyleSheet();
+	void SetupLayout(QLineEdit* cityInput, QLabel* fetchedDataLabel, QLabel* weatherPictureLabel);
+	std::string FetchDataAndUpdateDb(const std::string& city);
+	std::string GetWeatherData(const std::string& city);
+	void ApplyStyleSheet();
 	void Reconnect();
 	
 private slots:
-	void _showSpecificPicture(const std::string& weatherType);
-	void _displayWeatherData(const std::string& weatherData);
+	void ShowSpecificPicture(const std::string& weatherType);
+	void DisplayWeatherData(const std::string& weatherData);
 
 signals:
 	void ConnectionFailed();
