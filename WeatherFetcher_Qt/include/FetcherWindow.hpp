@@ -19,14 +19,16 @@ class FetcherWindow : public QWidget
 
 public:
 	FetcherWindow();
-	void Connect(const std::string& host);
+	void Connect();
 	void InitializeWeatherMapper();
+	void SetHost(const std::string& host) noexcept;
 
 private:
 	const QString _defaultDataOutput;
 	std::unique_ptr<WeatherMapper> _weatherMapper;
 	std::unique_ptr<ZClient> _client;
 	std::string _lastWeatherType;
+	std::string _host;
 	std::atomic<bool> _connected;
 
 	void _setupLayout(QLineEdit* cityInput, QLabel* fetchedDataLabel, QLabel* weatherPictureLabel);

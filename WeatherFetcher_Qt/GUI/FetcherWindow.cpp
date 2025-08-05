@@ -78,12 +78,17 @@ FetcherWindow::FetcherWindow() : _defaultDataOutput("No data fetched..."), _clie
 	setWindowIcon(icon);
 }
 
-void FetcherWindow::Connect(const std::string& host)
+void FetcherWindow::SetHost(const std::string& host) noexcept
 {
-	std::thread connectionJob([host, this]() {
+	_host = host;
+}
+
+void FetcherWindow::Connect()
+{
+	std::thread connectionJob([this]() {
 		try
 		{
-			_client->Connect(host);
+			_client->Connect(_host);
 			_connected.store(true, std::memory_order_relaxed);
 			InitializeWeatherMapper();
 		}
@@ -122,7 +127,7 @@ void FetcherWindow::InitializeWeatherMapper()
 void FetcherWindow::Reconnect()
 {
 	_client.reset(new ZClient());
-	_client->Connect();
+	Connect();
 }
 
 void FetcherWindow::_applyStyleSheet()
