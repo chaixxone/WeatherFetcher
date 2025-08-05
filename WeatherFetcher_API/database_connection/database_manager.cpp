@@ -1,6 +1,6 @@
 #include "database_manager.hpp"
 
-std::string DB_Manager::_getPassword(const std::string& pathToFile)
+std::string DB_Manager::GetPassword(const std::string& pathToFile)
 {
     std::ifstream file(pathToFile);
 
@@ -22,7 +22,7 @@ std::string DB_Manager::_getPassword(const std::string& pathToFile)
 }
 
 DB_Manager::DB_Manager(const std::unordered_map<std::string, std::string>& config) 
-    : m_server(config.at("host")), m_username(config.at("user")), m_password(_getPassword(config.at("password_file")))
+    : m_server(config.at("host")), m_username(config.at("user")), m_password(GetPassword(config.at("password_file")))
 { 
     m_driver = get_driver_instance();
     m_connection = std::unique_ptr<sql::Connection>(m_driver->connect(m_server, m_username, m_password));

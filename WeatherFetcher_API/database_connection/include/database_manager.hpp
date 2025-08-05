@@ -22,7 +22,7 @@ public:
 	std::string GetImageData(const std::string& imageName);
 
 private:
-	std::string _getPassword(const std::string& pathToFile);
+	std::string GetPassword(const std::string& pathToFile);
 	const std::string m_server;
 	const std::string m_username;
 	const std::string m_password;
