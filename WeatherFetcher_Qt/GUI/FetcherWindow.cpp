@@ -52,6 +52,24 @@ FetcherWindow::FetcherWindow() : _defaultDataOutput("No data fetched..."), _clie
 		}
 	});
 
+	connect(this, &FetcherWindow::ConnectionFailed, this, [this]() {
+		auto connectionFailureMessage = new QMessageBox(this);
+		connectionFailureMessage->setText("Couldn't connect to API\nWould you like to reconnect?");
+		connectionFailureMessage->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		connectionFailureMessage->show();
+
+		int buttonCode = connectionFailureMessage->exec();
+
+		if (buttonCode == QMessageBox::StandardButton::Yes)
+		{
+			Reconnect();
+		}
+		else
+		{
+			close();
+		}
+	});
+
 	setFixedSize(800, 600);
 	_setupLayout(cityInput, fetchedDataLabel, weatherPictureLabel);
 	_applyStyleSheet();

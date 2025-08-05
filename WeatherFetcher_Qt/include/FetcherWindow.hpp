@@ -37,4 +37,7 @@ private:
 private slots:
 	void _showSpecificPicture(const std::string& weatherType);
 	void _displayWeatherData(const std::string& weatherData);
+
+signals:
+	void ConnectionFailed();
 };
