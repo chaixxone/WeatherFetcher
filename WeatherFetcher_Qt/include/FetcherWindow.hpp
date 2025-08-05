@@ -18,13 +18,17 @@ class FetcherWindow : public QWidget
 	Q_OBJECT
 
 public:
-	FetcherWindow(const std::string& host);
+	FetcherWindow();
+	void Connect(const std::string& host);
+	void InitializeWeatherMapper();
 
 private:
 	const QString _defaultDataOutput;
 	std::unique_ptr<WeatherMapper> _weatherMapper;
 	std::unique_ptr<ZClient> _client;
 	std::string _lastWeatherType;
+	std::atomic<bool> _connected;
+
 	void _setupLayout(QLineEdit* cityInput, QLabel* fetchedDataLabel, QLabel* weatherPictureLabel);
 	std::string _fetchDataAndUpdateDb(const std::string& city);
 	std::string _getWeatherData(const std::string& city);

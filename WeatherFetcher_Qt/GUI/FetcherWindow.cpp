@@ -1,13 +1,13 @@
 #include "FetcherWindow.hpp"
+
 #include <QDateTime>
 #include <QFile>
+#include <QMessageBox>
+#include <QTimer>
 #include <QRegularExpression>
 
-FetcherWindow::FetcherWindow(const std::string& host) : _defaultDataOutput("No data fetched..."), _client(new ZClient(host)), _lastWeatherType("")
+FetcherWindow::FetcherWindow() : _defaultDataOutput("No data fetched..."), _client(new ZClient), _lastWeatherType(""), _connected(false)
 {
-	auto key = _client->MakeRequest("get_api_key", "");
-	_weatherMapper = std::make_unique<WeatherMapper>(key);
-
 	auto cityInput = new QLineEdit(this);
 	auto fetchedDataLabel = new QLabel(this);
 	auto weatherPictureLabel = new QLabel(this);
@@ -58,6 +58,47 @@ FetcherWindow::FetcherWindow(const std::string& host) : _defaultDataOutput("No d
 
 	QIcon icon(":/WetherFetcher_Qt/logo.png");
 	setWindowIcon(icon);
+}
+
+void FetcherWindow::Connect(const std::string& host)
+{
+	std::thread connectionJob([host, this]() {
+		try
+		{
+			_client->Connect(host);
+			_connected.store(true, std::memory_order_relaxed);
+			InitializeWeatherMapper();
+		}
+		catch (const std::runtime_error& e)
+		{
+			// TODO: inform user with message box about connection failure
+			std::cerr << e.what() << '\n';
+		}
+	});
+
+	const int timeoutDuration = 5000;
+
+	QTimer::singleShot(std::chrono::milliseconds(timeoutDuration), [&]() {
+		if (!_connected.load())
+		{
+			_client->DestroyClientWork();
+		}
+	});
+
+	connectionJob.detach();
+}
+
+void FetcherWindow::InitializeWeatherMapper()
+{
+	try
+	{		
+		std::string key = _client->MakeRequest("get_api_key", "");
+		_weatherMapper = std::make_unique<WeatherMapper>(key);
+	}
+	catch (const std::runtime_error& e)
+	{
+		// TODO handle exception
+	}
 }
 
 void FetcherWindow::_applyStyleSheet()
