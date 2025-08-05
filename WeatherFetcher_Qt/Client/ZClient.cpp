@@ -7,7 +7,7 @@ ZClient::ZClient() : _context(1), _socket(_context, zmq::socket_type::req)
 	_socket.set(zmq::sockopt::linger, 2000);
 }
 
-void ZClient::_setToken()
+void ZClient::SetToken()
 {
 	auto expireTime = system_clock::now() + seconds(10);
 
@@ -20,9 +20,9 @@ void ZClient::_setToken()
 	_token = token;
 }
 
-std::string ZClient::_authorise()
+std::string ZClient::Authorise()
 {
-	_setToken();
+	SetToken();
 	auto authoriseReply = MakeRequest("auth", "");
 	return authoriseReply;
 }
@@ -35,7 +35,7 @@ void ZClient::DestroyClientWork()
 void ZClient::Connect(const std::string& host)
 {
 	_socket.connect(host);
-	_authorise();
+	Authorise();
 }
 
 std::string ZClient::MakeRequest(const std::string& typeRequest, const std::string& data)
@@ -68,7 +68,7 @@ std::string ZClient::MakeRequest(const std::string& typeRequest, const std::stri
 
 	if (response == "Authentication required or token invalid")
 	{
-		std::string authorizeResponse = _authorise();
+		std::string authorizeResponse = Authorise();
 		return authorizeResponse == "Authentication successful" ? MakeRequest(typeRequest, data) : "died";
 	}
 

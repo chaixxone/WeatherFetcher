@@ -22,6 +22,6 @@ private:
 	zmq::context_t _context;
 	zmq::socket_t _socket;
 	std::string _token;
-	std::string _authorise();
-	void _setToken();
+	std::string Authorise();
+	void SetToken();
 };
