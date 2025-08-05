@@ -18,6 +18,5 @@ private:
     std::unique_ptr<DB_Manager> m_db;
 
     bool _verifyJWT(const std::string& token);
-    void _handleRequests(const Requests& requestEnum, const std::string& requestData, const std::string& token);
-    std::string _getFileData(const std::string& filePath) const;
+    void _handleRequests(const Requests& requestEnum, const std::string& requestData, const std::string& token);    
 };
