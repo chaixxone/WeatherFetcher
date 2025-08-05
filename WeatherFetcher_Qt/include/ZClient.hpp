@@ -18,7 +18,7 @@ public:
 	void DestroyClientWork();
 
 private:
-	std::mutex _mutex;
+	std::recursive_mutex _mutex;
 	zmq::context_t _context;
 	zmq::socket_t _socket;
 	std::string _token;

@@ -43,7 +43,7 @@ std::string ZClient::MakeRequest(const std::string& typeRequest, const std::stri
 	zmq::multipart_t request;
 	zmq::message_t reply;
 
-	std::unique_lock<std::mutex> lock(_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 	try
 	{
