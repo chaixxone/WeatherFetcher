@@ -2,6 +2,11 @@
 
 using namespace std::chrono;
 
+ZClient::ZClient() : _context(1), _socket(_context, zmq::socket_type::req)
+{
+	
+}
+
 void ZClient::_setToken()
 {
 	auto expireTime = system_clock::now() + seconds(10);
@@ -22,7 +27,12 @@ std::string ZClient::_authorise()
 	return authoriseReply;
 }
 
-ZClient::ZClient(const std::string& host) : _context(1), _socket(_context, zmq::socket_type::req)
+void ZClient::DestroyClientWork()
+{
+	_context.shutdown();
+}
+
+void ZClient::Connect(const std::string& host)
 {
 	_socket.connect(host);
 	_authorise();
@@ -31,19 +41,35 @@ ZClient::ZClient(const std::string& host) : _context(1), _socket(_context, zmq::
 std::string ZClient::MakeRequest(const std::string& typeRequest, const std::string& data)
 {
 	zmq::multipart_t request;
-	request.addstr(_token);
-	request.addstr(typeRequest);
-	request.addstr(data);
-	request.send(_socket);
-
 	zmq::message_t reply;
-	_socket.recv(reply);
-	auto response = reply.to_string();
+
+	std::unique_lock<std::mutex> lock(_mutex);
+
+	try
+	{
+		request.addstr(_token);
+		request.addstr(typeRequest);
+		request.addstr(data);
+		request.send(_socket);
+
+		zmq::recv_result_t res = _socket.recv(reply);
+
+		if (!res.has_value()) return "Received empty reply";
+	}
+	catch (const zmq::error_t& e)
+	{
+		if (e.num() == ETERM)
+		{			
+			throw std::runtime_error("Client is destroyed");
+		}
+	}
+
+	std::string response = reply.to_string();
 
 	if (response == "Authentication required or token invalid")
 	{
-		auto resp = _authorise();
-		return resp == "Authentication successful" ? MakeRequest(typeRequest, data) : "died";
+		std::string authorizeResponse = _authorise();
+		return authorizeResponse == "Authentication successful" ? MakeRequest(typeRequest, data) : "died";
 	}
 
 	return response;
