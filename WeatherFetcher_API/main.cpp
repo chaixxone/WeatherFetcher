@@ -28,8 +28,8 @@ int main(int argc, char** argv)
         config["schema"]        = "weather";
 #endif
 
-        auto api = std::make_unique<Z_API>(serverhost, config);
-        api->Run();
+        Z_API api{ serverhost, config };
+        api.Run();
     }
     catch (const sql::SQLException& e)
     {
